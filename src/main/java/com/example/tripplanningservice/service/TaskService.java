@@ -1,10 +1,12 @@
 package com.example.tripplanningservice.service;
 
 import com.example.tripplanningservice.dto.ShortTaskDTO;
+import com.example.tripplanningservice.dto.TaskDTO;
 import com.example.tripplanningservice.dto.TaskMapper;
 import com.example.tripplanningservice.exception.RouteNotFoundException;
 import com.example.tripplanningservice.model.Route;
 import com.example.tripplanningservice.model.Task;
+import com.example.tripplanningservice.model.Waypoint;
 import com.example.tripplanningservice.repository.RouteRepository;
 import com.example.tripplanningservice.repository.TaskRepository;
 import com.example.tripplanningservice.repository.WaypointRepository;
@@ -21,8 +23,8 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     @Transactional
-    public ShortTaskDTO createRouteTask(ShortTaskDTO shortTaskDTO, long id) {
-        Route route = routeRepository.findById(id);
+    public TaskDTO createRouteTask(ShortTaskDTO shortTaskDTO, long route_id) {
+        Route route = routeRepository.findById(route_id);
         if (route == null) {
             throw new RouteNotFoundException("Route doesn't found");
         }
@@ -31,7 +33,23 @@ public class TaskService {
         task.setDescription(shortTaskDTO.getDescription());
         task.setCompleted(false);
         taskRepository.save(task);
-        return TaskMapper.toShortTaskDTO(task);
+        return TaskMapper.toTaskDTO(task);
+    }
+
+    @Transactional
+    public TaskDTO createWaypointTask(ShortTaskDTO shortTaskDTO, long route_id, long waypoint_id) {
+        Waypoint waypoint = waypointRepository.findById(waypoint_id);
+        if (waypoint == null) {
+            throw new RouteNotFoundException("Waypoint doesn't found");
+        }
+        Route route = routeRepository.findById(route_id);
+        Task task = new Task();
+        task.setRoute(route);
+        task.setWaypoint(waypoint);
+        task.setDescription(shortTaskDTO.getDescription());
+        task.setCompleted(false);
+        taskRepository.save(task);
+        return TaskMapper.toTaskDTO(task);
     }
 
 
