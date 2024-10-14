@@ -14,6 +14,8 @@ public class Task {
     private Long id;
     @Column(name = "description")
     private String description;
+    @Column(name = "author_username", nullable = false)
+    private String authorUsername;
     @Column(name = "completed")
     private Boolean completed;
 

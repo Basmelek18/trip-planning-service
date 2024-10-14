@@ -16,6 +16,8 @@ public class Waypoint {
     private Long id;
     @Column(name = "location_name", nullable = false)
     private String locationName;
+    @Column(name = "author_username", nullable = false)
+    private String authorUsername;
     @Column(name = "latitude")
     private Double latitude;
     @Column(name = "longitude")

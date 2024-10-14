@@ -2,6 +2,7 @@ package com.example.tripplanningservice.service;
 
 import com.example.tripplanningservice.dto.RouteDTO;
 import com.example.tripplanningservice.dto.RouteMapper;
+import com.example.tripplanningservice.exception.RouteNotFoundException;
 import com.example.tripplanningservice.model.Route;
 import com.example.tripplanningservice.repository.RouteRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,10 @@ public class RouteService {
     private final RouteRepository routeRepository;
 
     @Transactional
-    public RouteDTO createRoute(RouteDTO routeDTO) {
+    public RouteDTO createRoute(String username, RouteDTO routeDTO) {
         Route route = new Route();
         route.setName(routeDTO.getName());
+        route.setAuthorUsername(username);
         route.setStartLocation(routeDTO.getStartLocation());
         route.setEndLocation(routeDTO.getEndLocation());
         routeRepository.save(route);
@@ -27,6 +29,9 @@ public class RouteService {
     @Transactional
     public RouteDTO updateRoute(RouteDTO routeDTO, long id) {
         Route route = routeRepository.findById(id);
+        if (route == null) {
+            throw new RouteNotFoundException("Route doesn't exist");
+        }
         route.setName(routeDTO.getName());
         route.setStartLocation(routeDTO.getStartLocation());
         route.setStartLocation(routeDTO.getEndLocation());

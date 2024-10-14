@@ -23,13 +23,14 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     @Transactional
-    public TaskDTO createRouteTask(ShortTaskDTO shortTaskDTO, long route_id) {
+    public TaskDTO createRouteTask(String username, ShortTaskDTO shortTaskDTO, long route_id) {
         Route route = routeRepository.findById(route_id);
         if (route == null) {
             throw new RouteNotFoundException("Route doesn't found");
         }
         Task task = new Task();
         task.setRoute(route);
+        task.setAuthorUsername(username);
         task.setDescription(shortTaskDTO.getDescription());
         task.setCompleted(false);
         taskRepository.save(task);
@@ -37,15 +38,19 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskDTO createWaypointTask(ShortTaskDTO shortTaskDTO, long route_id, long waypoint_id) {
+    public TaskDTO createWaypointTask(String username, ShortTaskDTO shortTaskDTO, long route_id, long waypoint_id) {
         Waypoint waypoint = waypointRepository.findById(waypoint_id);
         if (waypoint == null) {
             throw new RouteNotFoundException("Waypoint doesn't found");
         }
         Route route = routeRepository.findById(route_id);
+        if (route == null) {
+            throw new RouteNotFoundException("Route doesn't found");
+        }
         Task task = new Task();
         task.setRoute(route);
         task.setWaypoint(waypoint);
+        task.setAuthorUsername(username);
         task.setDescription(shortTaskDTO.getDescription());
         task.setCompleted(false);
         taskRepository.save(task);

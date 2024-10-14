@@ -17,6 +17,8 @@ public class Route {
     private Long id;
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "author_username", nullable = false)
+    private String authorUsername;
     @Column(name = "start_location", nullable = false)
     private String startLocation;
     @Column(name = "end_location", nullable = false)

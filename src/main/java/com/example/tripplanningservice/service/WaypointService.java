@@ -20,13 +20,14 @@ public class WaypointService {
     private final RouteRepository routeRepository;
 
     @Transactional
-    public WaypointDTO createWaypoint(WaypointDTO waypointDTO, long id) {
+    public WaypointDTO createWaypoint(String username, WaypointDTO waypointDTO, long id) {
         Route route = routeRepository.findById(id);
         if (route == null) {
             throw new RouteNotFoundException("Route doesn't found");
         }
         Waypoint waypoint = new Waypoint();
         waypoint.setLocationName(waypointDTO.getLocationName());
+        waypoint.setAuthorUsername(username);
         waypoint.setLatitude(waypointDTO.getLatitude());
         waypoint.setLongitude(waypointDTO.getLongitude());
         waypoint.setRoute(route);
