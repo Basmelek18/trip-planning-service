@@ -5,6 +5,8 @@ import com.example.tripplanningservice.dto.RouteDTO;
 import com.example.tripplanningservice.service.RouteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,19 +16,21 @@ public class RouteController {
     private final RouteService routeService;
     private final JwtTokenUtil jwtTokenUtil;
 
+
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public RouteDTO postRoute(@RequestBody RouteDTO routeDTO, @RequestHeader("Authorization") String authorizationHeader){
-        String token = null;
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-        }
-        return routeService.createRoute(jwtTokenUtil.extractUsername(token), routeDTO);
+    public RouteDTO postRoute(@RequestBody RouteDTO routeDTO, Authentication authentication){
+        String currentUserId = authentication.getName();
+        return routeService.createRoute(currentUserId, routeDTO);
     }
 
     @PostMapping("/{route_id}")
     @ResponseStatus(HttpStatus.OK)
-    public RouteDTO updateRoute(@RequestBody RouteDTO routeDTO, @PathVariable long route_id) {
+    public RouteDTO updateRoute(@RequestBody RouteDTO routeDTO, @PathVariable long route_id, Authentication authentication) {
+        String currentUserId = authentication.getName();
+        if (!routeService.isOwner(route_id, currentUserId)) {
+            throw new AccessDeniedException("You are not allowed to update this route");
+        }
         return routeService.updateRoute(routeDTO, route_id);
     }
 

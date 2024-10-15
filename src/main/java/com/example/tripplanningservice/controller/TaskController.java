@@ -6,6 +6,7 @@ import com.example.tripplanningservice.service.TaskService;
 import com.example.tripplanningservice.service.WaypointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +18,20 @@ public class TaskController {
 
     @PostMapping("/task")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO createRouteTask(@RequestBody ShortTaskDTO shortTaskDTO, @PathVariable long routeId) {
-        return taskService.createRouteTask(shortTaskDTO, routeId);
+    public TaskDTO createRouteTask(@RequestBody ShortTaskDTO shortTaskDTO, @PathVariable long routeId, Authentication authentication){
+        String currentUserId = authentication.getName();
+        return taskService.createRouteTask(currentUserId, shortTaskDTO, routeId);
     }
 
     @PostMapping("/waypoint/{waypointId}/task")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO createWaypointTask(@RequestBody ShortTaskDTO shortTaskDTO, @PathVariable long routeId, @PathVariable long waypointId) {
-        return taskService.createWaypointTask(shortTaskDTO, routeId, waypointId);
+    public TaskDTO createWaypointTask(
+            @RequestBody ShortTaskDTO shortTaskDTO,
+            @PathVariable long routeId,
+            @PathVariable long waypointId,
+            Authentication authentication
+    ){
+        String currentUserId = authentication.getName();
+        return taskService.createWaypointTask(currentUserId, shortTaskDTO, routeId, waypointId);
     }
 }
