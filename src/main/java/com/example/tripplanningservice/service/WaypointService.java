@@ -1,8 +1,7 @@
 package com.example.tripplanningservice.service;
 
-import com.example.tripplanningservice.dto.WaypointDTO;
-import com.example.tripplanningservice.dto.WaypointMapper;
-import com.example.tripplanningservice.exception.RouteNotFoundException;
+import com.example.tripplanningservice.dto.*;
+import com.example.tripplanningservice.exception.NotFoundException;
 import com.example.tripplanningservice.model.Route;
 import com.example.tripplanningservice.model.Waypoint;
 import com.example.tripplanningservice.repository.RouteRepository;
@@ -23,7 +22,7 @@ public class WaypointService {
     public WaypointDTO createWaypoint(String username, WaypointDTO waypointDTO, long id) {
         Route route = routeRepository.findById(id);
         if (route == null) {
-            throw new RouteNotFoundException("Route doesn't found");
+            throw new NotFoundException("Route doesn't found");
         }
         Waypoint waypoint = new Waypoint();
         waypoint.setLocationName(waypointDTO.getLocationName());
@@ -33,5 +32,33 @@ public class WaypointService {
         waypoint.setRoute(route);
         waypointRepository.save(waypoint);
         return WaypointMapper.toWaypointDTO(waypoint);
+    }
+
+    @Transactional
+    public WaypointDTO updateWaypoint(WaypointDTO waypointDTO, long waypointId) {
+        Waypoint waypoint = waypointRepository.findById(waypointId);
+        if (waypoint == null) {
+            throw new NotFoundException("Waypoint doesn't found");
+        }
+        waypoint.setLocationName(waypointDTO.getLocationName());
+        waypoint.setLatitude(waypointDTO.getLatitude());
+        waypoint.setLongitude(waypointDTO.getLongitude());
+        waypointRepository.save(waypoint);
+        return WaypointMapper.toWaypointDTO(waypoint);
+    }
+
+    @Transactional
+    public boolean deleteWaypoint(long waypointId) {
+        if (waypointRepository.existsById(waypointId)) {
+            waypointRepository.deleteById(waypointId);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isOwner(Long waypointId, String currentUsername) {
+        Waypoint waypoint = waypointRepository.findById(waypointId)
+                .orElseThrow(() -> new NotFoundException("Waypoint doesn't found"));
+        return waypoint.getAuthorUsername().equals(currentUsername);
     }
 }
