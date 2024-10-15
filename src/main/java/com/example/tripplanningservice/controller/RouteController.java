@@ -23,23 +23,23 @@ public class RouteController {
         return routeService.createRoute(currentUsername, routeDTO);
     }
 
-    @PostMapping("/{route_id}")
-    public RouteDTO updateRoute(@RequestBody RouteDTO routeDTO, @PathVariable long route_id, Authentication authentication) {
+    @PostMapping("/{routeId}")
+    public RouteDTO updateRoute(@RequestBody RouteDTO routeDTO, @PathVariable long routeId, Authentication authentication) {
         String currentUsername = authentication.getName();
-        if (!routeService.isOwner(route_id, currentUsername)) {
+        if (!routeService.isOwner(routeId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this route");
         }
-        return routeService.updateRoute(routeDTO, route_id);
+        return routeService.updateRoute(routeDTO, routeId);
     }
 
-    @DeleteMapping("/{route_id}")
+    @DeleteMapping("/{routeId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> deleteRoute(@PathVariable long route_id, Authentication authentication) {
+    public ResponseEntity<Void> deleteRoute(@PathVariable long routeId, Authentication authentication) {
         String currentUsername = authentication.getName();
-        if (!routeService.isOwner(route_id, currentUsername)) {
+        if (!routeService.isOwner(routeId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to delete this route");
         }
-        boolean isDeleted = routeService.deleteRoute(route_id);
+        boolean isDeleted = routeService.deleteRoute(routeId);
         if (isDeleted) {
             return ResponseEntity.noContent().build();
         } else {
