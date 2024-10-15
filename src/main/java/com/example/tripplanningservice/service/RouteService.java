@@ -35,9 +35,18 @@ public class RouteService {
         }
         route.setName(routeDTO.getName());
         route.setStartLocation(routeDTO.getStartLocation());
-        route.setStartLocation(routeDTO.getEndLocation());
+        route.setEndLocation(routeDTO.getEndLocation());
         routeRepository.save(route);
         return RouteMapper.toRouteDTO(route);
+    }
+
+    @Transactional
+    public boolean deleteRoute(long id) {
+        if (routeRepository.existsById(id)) {
+            routeRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     public boolean isOwner(Long routeId, String currentUsername) {
