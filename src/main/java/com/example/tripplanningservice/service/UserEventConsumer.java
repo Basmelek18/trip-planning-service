@@ -23,9 +23,9 @@ public class UserEventConsumer {
             if ("delete".equals(userEvent.getStatus())) {
                 userCacheService.removeUserFromCache(username);
             }
-            if ("created".equals(userEvent.getStatus())) {
-                userCacheService.addUserToCache(userEvent);
-            }
+        if ("created".equals(userEvent.getStatus())) {
+            userCacheService.addUserToCache(userEvent);
+        }
         }
     }
 }

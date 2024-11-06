@@ -1,7 +1,9 @@
 package com.example.tripplanningservice.controller;
 
 import com.example.tripplanningservice.dto.RouteDTO;
+import com.example.tripplanningservice.exception.NotFoundException;
 import com.example.tripplanningservice.service.RouteService;
+import com.example.tripplanningservice.service.UserCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/route")
 public class RouteController {
     private final RouteService routeService;
+    private final UserCacheService userCacheService;
 
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public RouteDTO postRoute(@RequestBody RouteDTO routeDTO, Authentication authentication){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         return routeService.createRoute(currentUsername, routeDTO);
     }
 
