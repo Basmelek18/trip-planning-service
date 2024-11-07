@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -15,17 +14,17 @@ public class UserEventConsumer {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final UserCacheService userCacheService;
 
-    @KafkaListener(topics = "${kafka.topic}", groupId = "user-group")
+    @KafkaListener(topics = "${kafka.topic}", groupId = "user-updates")
     public void consumeUserEvent(String message) throws JsonProcessingException {
         UserEvent userEvent = objectMapper.readValue(message, UserEvent.class);
         String username = userEvent.getUsername();
         if (userCacheService.isUserInCache(username)) {
-            if ("delete".equals(userEvent.getStatus())) {
+            if ("deleted".equals(userEvent.getStatus())) {
                 userCacheService.removeUserFromCache(username);
             }
+        }
         if ("created".equals(userEvent.getStatus())) {
             userCacheService.addUserToCache(userEvent);
-        }
         }
     }
 }
