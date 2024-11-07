@@ -32,6 +32,9 @@ public class RouteController {
     @PostMapping("/{routeId}")
     public RouteDTO updateRoute(@RequestBody RouteDTO routeDTO, @PathVariable long routeId, Authentication authentication) {
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!routeService.isOwner(routeId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this route");
         }
@@ -42,6 +45,9 @@ public class RouteController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> deleteRoute(@PathVariable long routeId, Authentication authentication) {
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!routeService.isOwner(routeId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to delete this route");
         }

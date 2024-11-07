@@ -2,7 +2,9 @@ package com.example.tripplanningservice.controller;
 
 import com.example.tripplanningservice.dto.ShortTaskDTO;
 import com.example.tripplanningservice.dto.TaskDTO;
+import com.example.tripplanningservice.exception.NotFoundException;
 import com.example.tripplanningservice.service.TaskService;
+import com.example.tripplanningservice.service.UserCacheService;
 import com.example.tripplanningservice.service.WaypointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/route/{routeId}")
 public class TaskController {
     private final TaskService taskService;
+    private final UserCacheService userCacheService;
 
     @PostMapping("/task")
     @ResponseStatus(HttpStatus.CREATED)
@@ -25,6 +28,9 @@ public class TaskController {
             Authentication authentication
     ){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         return taskService.createRouteTask(currentUsername, shortTaskDTO, routeId);
     }
 
@@ -37,6 +43,9 @@ public class TaskController {
             Authentication authentication
     ){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!taskService.isOwner(taskId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this task");
         }
@@ -50,6 +59,9 @@ public class TaskController {
             @PathVariable long taskId,
             Authentication authentication) {
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!taskService.isOwner(taskId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this task");
         }
@@ -70,6 +82,9 @@ public class TaskController {
             Authentication authentication
     ){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         return taskService.createWaypointTask(currentUsername, shortTaskDTO, routeId, waypointId);
     }
 
@@ -83,6 +98,9 @@ public class TaskController {
             Authentication authentication
     ){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!taskService.isOwner(taskId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this task");
         }
@@ -97,6 +115,9 @@ public class TaskController {
             @PathVariable long taskId,
             Authentication authentication) {
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         if (!taskService.isOwner(taskId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this task");
         }

@@ -1,6 +1,8 @@
 package com.example.tripplanningservice.controller;
 
 import com.example.tripplanningservice.dto.WaypointDTO;
+import com.example.tripplanningservice.exception.NotFoundException;
+import com.example.tripplanningservice.service.UserCacheService;
 import com.example.tripplanningservice.service.WaypointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/route/{routeId}")
 public class WaypointController {
     private final WaypointService waypointService;
+    private final UserCacheService userCacheService;
 
     @PostMapping("/waypoint")
     @ResponseStatus(HttpStatus.CREATED)
@@ -23,6 +26,9 @@ public class WaypointController {
             Authentication authentication
     ){
         String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
         return waypointService.createWaypoint(currentUsername, waypointDTO, routeId);
     }
 
