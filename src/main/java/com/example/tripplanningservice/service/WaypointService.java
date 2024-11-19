@@ -19,8 +19,20 @@ public class WaypointService {
     private final RouteRepository routeRepository;
 
     @Transactional
-    public WaypointDTO createWaypoint(String username, WaypointDTO waypointDTO, long id) {
-        Route route = routeRepository.findById(id);
+    public FullWaypointDTO getWaypoint(long routeId, long waypointId) {
+        Waypoint waypoint = waypointRepository.findById(waypointId);
+        if (waypoint == null) {
+            throw new NotFoundException("Waypoint doesn't found");
+        }
+        if (routeId != waypoint.getRoute().getId()) {
+            throw new NotFoundException("Waypoint doesn't found");
+        }
+        return WaypointMapper.toFullWaypointDTO(waypoint);
+    }
+
+    @Transactional
+    public WaypointDTO createWaypoint(String username, WaypointDTO waypointDTO, long routeId) {
+        Route route = routeRepository.findById(routeId);
         if (route == null) {
             throw new NotFoundException("Route doesn't found");
         }
@@ -35,9 +47,12 @@ public class WaypointService {
     }
 
     @Transactional
-    public WaypointDTO updateWaypoint(WaypointDTO waypointDTO, long waypointId) {
+    public WaypointDTO updateWaypoint(WaypointDTO waypointDTO, long routeId, long waypointId) {
         Waypoint waypoint = waypointRepository.findById(waypointId);
         if (waypoint == null) {
+            throw new NotFoundException("Waypoint doesn't found");
+        }
+        if (routeId != waypoint.getRoute().getId()) {
             throw new NotFoundException("Waypoint doesn't found");
         }
         waypoint.setLocationName(waypointDTO.getLocationName());

@@ -1,5 +1,6 @@
 package com.example.tripplanningservice.service;
 
+import com.example.tripplanningservice.dto.FullRouteDTO;
 import com.example.tripplanningservice.dto.RouteDTO;
 import com.example.tripplanningservice.dto.RouteMapper;
 import com.example.tripplanningservice.exception.NotFoundException;
@@ -9,11 +10,31 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RouteService {
     private final RouteRepository routeRepository;
+
+    @Transactional
+    public FullRouteDTO getRoute(long id) {
+        Route route = routeRepository.findById(id);
+        if (route == null) {
+            throw new NotFoundException("Route doesn't exist");
+        }
+        return RouteMapper.toFullRouteDTO(route);
+    }
+
+    @Transactional
+    public List<FullRouteDTO> getAllRoutes() {
+        return routeRepository.findAll()
+                .stream()
+                .map(RouteMapper::toFullRouteDTO)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public RouteDTO createRoute(String username, RouteDTO routeDTO) {

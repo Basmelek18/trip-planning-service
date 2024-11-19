@@ -1,5 +1,6 @@
 package com.example.tripplanningservice.controller;
 
+import com.example.tripplanningservice.dto.FullRouteDTO;
 import com.example.tripplanningservice.dto.RouteDTO;
 import com.example.tripplanningservice.exception.NotFoundException;
 import com.example.tripplanningservice.service.RouteService;
@@ -11,6 +12,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/route")
@@ -18,6 +21,26 @@ public class RouteController {
     private final RouteService routeService;
     private final UserCacheService userCacheService;
 
+
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public List<FullRouteDTO> getAllRoutes(Authentication authentication) {
+        String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
+        return routeService.getAllRoutes();
+    }
+
+    @GetMapping("/{routeId}")
+    @ResponseStatus(HttpStatus.OK)
+    public FullRouteDTO getRoute(@PathVariable long routeId, Authentication authentication) {
+        String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
+        return routeService.getRoute(routeId);
+    }
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)

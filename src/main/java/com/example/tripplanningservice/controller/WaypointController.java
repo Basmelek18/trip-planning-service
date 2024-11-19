@@ -1,5 +1,6 @@
 package com.example.tripplanningservice.controller;
 
+import com.example.tripplanningservice.dto.FullWaypointDTO;
 import com.example.tripplanningservice.dto.WaypointDTO;
 import com.example.tripplanningservice.exception.NotFoundException;
 import com.example.tripplanningservice.service.UserCacheService;
@@ -17,6 +18,20 @@ import org.springframework.web.bind.annotation.*;
 public class WaypointController {
     private final WaypointService waypointService;
     private final UserCacheService userCacheService;
+
+    @GetMapping("/waypoint/{waypointId}")
+    @ResponseStatus(HttpStatus.OK)
+    public FullWaypointDTO getWaypoint(
+            @PathVariable long routeId,
+            @PathVariable long waypointId,
+            Authentication authentication
+    ){
+        String currentUsername = authentication.getName();
+        if (!userCacheService.isUserInCache(currentUsername)) {
+            throw new NotFoundException("Your username is not in cache");
+        }
+        return waypointService.getWaypoint(routeId, waypointId);
+    }
 
     @PostMapping("/waypoint")
     @ResponseStatus(HttpStatus.CREATED)
@@ -44,7 +59,7 @@ public class WaypointController {
         if (!waypointService.isOwner(waypointId, currentUsername)) {
             throw new AccessDeniedException("You are not allowed to update this task");
         }
-        return waypointService.updateWaypoint(waypointDTO, waypointId);
+        return waypointService.updateWaypoint(waypointDTO, routeId, waypointId);
     }
 
     @DeleteMapping("/waypoint/{waypointId}")
